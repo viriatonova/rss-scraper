@@ -1,10 +1,10 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const port = 53000;
 const mongoose = require('mongoose');
 
-mongoose.connect(process.env.CONNECTMONGO, {
+mongoose.connect(process.env.CONNECTING_MONGO, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {

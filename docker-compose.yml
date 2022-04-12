@@ -14,14 +14,14 @@ services:
             - ./api:/api
         networks:
             - api-rest
-        command: node server.js
+        command: npm run start
 
     mongo:
         image: mongo
         restart: always
         environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: example
+            MONGO_INITDB_ROOT_USERNAME: $MONGO_USERNAME
+            MONGO_INITDB_ROOT_PASSWORD: $MONGO_PASSWORD
         volumes:
             - ./api/db:/data/db
         networks:
@@ -33,9 +33,9 @@ services:
         ports:
             - 8081:8081
         environment:
-            ME_CONFIG_MONGODB_ADMINUSERNAME: root
-            ME_CONFIG_MONGODB_ADMINPASSWORD: example
-            ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+            ME_CONFIG_MONGODB_ADMINUSERNAME: $MONGO_USERNAME
+            ME_CONFIG_MONGODB_ADMINPASSWORD: $MONGO_PASSWORD
+            ME_CONFIG_MONGODB_URL: $MONGO_URL
         networks:
             - api-rest
 
