@@ -1,7 +1,8 @@
 const mongose = require('mongoose');
 const fetch = require('node-fetch');
-const xml = require('xml-js');
+const xml2js = require('xml2js');
 const fs = require('fs');
+const { get } = require('http');
 
 
 
@@ -14,34 +15,35 @@ const HomeSchema = new mongose.Schema({
 const HomeModel = mongose.model('Home', HomeSchema)
 
 class Home {
-    constructor(body) {
+    constructor(body, url) {
         this.body = body
+        this.url = url
     };
 
-    async getRSS (url) {
+    async getRSS () {
         try {
-            const response = await fetch(url);
+            const parser = new xml2js.Parser()
+            const response = await fetch(this.url);
             const result = await response.text()
-            const data = await xml.xml2json(result, {compact: true, spaces: 4});
-            const siteName = url.match(/(?<=\.)(.+?)(?=\.)/g)
-            fs.writeFileSync(`../data/${siteName}RSS.json`, data)
-            return
+            const data = await parser.parseStringPromise(result)
+            return data
         } catch (err) {
             console.log(err)
-         
         }
     };
 
     
-    getSitesData(file) {
-        const items = file.rss.channel.item
+   async getSitesData() {
+        const data = await this.getRSS(this.url)
+        const items = await data.rss.channel[0].item
+
         this.body = {
-            checkDate: file.rss.channel.lastBuildDate._text,
+            checkDate: data.rss.channel.lastBuildDate,
             urls:[]
         }
 
         for (let key in items) {
-            this.body.urls.push(items[key].source._attributes.url)
+            this.body.urls.push(items[key])
         }
 
         return this.body
